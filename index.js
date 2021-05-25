@@ -7,7 +7,18 @@ const sha256 = (data) => {
 }
 
 const headers = {
-    'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
+    'authority': 'cdn-api.co-vin.in',
+    'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+    'accept': 'application/json, text/plain, */*',
+    'sec-ch-ua-mobile': '?0',
+    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
+    'content-type': 'application/json',
+    'origin': 'https://selfregistration.cowin.gov.in',
+    'sec-fetch-site': 'cross-site',
+    'sec-fetch-mode': 'cors',
+    'sec-fetch-dest': 'empty',
+    'referer': 'https://selfregistration.cowin.gov.in/',
+    'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8'
 }
 
 class Cowin {
@@ -59,4 +70,23 @@ class Cowin {
         return res.data.beneficiaries
     }
 
+    static async addBeneficiary({  }) {
+        const res = await axios({
+            method: 'POST',
+            url: 'http://cdn-api.co-vin.in/api/v2/registration/beneficiary/new',
+            headers: {
+                ...headers,
+                authorization: 'Bearer ' + token
+            },
+            data: {
+                name,
+                birth_year,
+                gender_id,
+                photo_id_type,
+                photo_id_number,
+                comorbidity_ind: "Y",
+                consent_version
+            }
+        })
+    }
 }
