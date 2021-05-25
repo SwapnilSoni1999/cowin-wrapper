@@ -144,3 +144,5 @@ class Cowin {
         return res.status
     }
 }
+
+module.exports = Cowin
