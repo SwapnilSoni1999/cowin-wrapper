@@ -58,6 +58,10 @@ class Cowin {
         return res.data.token
     }
     
+    /**
+     * @param {string} token JWT token
+     * @returns {Array}
+     */
     static async getBeneficiaries(token) {
         const res = await axios({
             method: 'GET',
@@ -70,7 +74,36 @@ class Cowin {
         return res.data.beneficiaries
     }
 
-    static async addBeneficiary({  }) {
+    /**
+     * @returns {Array} ID types
+     */
+    static async getIdTypes() {
+        const res = await axios({
+            method: 'GET',
+            url: ' https://cdn-api.co-vin.in/api/v2/registration/beneficiary/idTypes',
+            headers
+        })
+        return res.data.types
+    }
+
+    /**
+     * @returns {Array} Gender types
+     */
+    static async getGenders() {
+        const res = await axios({
+            method: 'GET',
+            url: 'https://cdn-api.co-vin.in/api/v2/registration/beneficiary/genders',
+            headers
+        })
+        return res.data.genders
+    }
+
+    /**
+     * @param {Object} {Data}
+     * @param {string} token JWT
+     * @returns 
+     */
+    static async addBeneficiary({ name, birth_year, gender_id, photo_id_type, photo_id_number }, token) {
         const res = await axios({
             method: 'POST',
             url: 'http://cdn-api.co-vin.in/api/v2/registration/beneficiary/new',
@@ -85,8 +118,29 @@ class Cowin {
                 photo_id_type,
                 photo_id_number,
                 comorbidity_ind: "Y",
-                consent_version
+                consent_version: "V1"
             }
         })
+        return res.data.beneficiary_reference_id
+    }
+
+    /**
+     * @param {string} token JWT Token
+     * @param {string} beneficiary_reference_id Beneficiary ID
+     * @returns {number} status code 204
+     */
+    static async deleteBeneficiary (token, beneficiary_reference_id) {
+        const res = await axios({
+            method: 'POST',
+            url: ' https://www.cowin.gov.in/api/v2/registration/beneficiary/delete',
+            headers: {
+                ...headers,
+                authorization: 'Bearer ' + token
+            },
+            data: {
+                beneficiary_reference_id
+            }
+        })
+        return res.status
     }
 }
