@@ -164,6 +164,25 @@ class Cowin {
         })
         return res.data.centers
     }
+
+    /**
+     * @param {string} token JWT Token 
+     * @returns {Promise<ArrayBuffer>} arraybuffer of pdf file
+     */
+    static async downloadCertificatae (token, beneficiary_reference_id) {
+        const res = await httpCowin({
+            method: 'GET',
+            url: 'https://www.cowin.gov.in/api/v2/registration/certificate/download',
+            params: {
+                beneficiary_reference_id
+            },
+            headers: {
+                authorization: 'Bearer ' + token
+            },
+            responseType: 'arraybuffer'
+        })
+        return res.data
+    }
 }
 
 module.exports = Cowin
