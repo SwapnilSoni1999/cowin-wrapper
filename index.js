@@ -19,7 +19,8 @@ const httpCowin = axios.create({
         'sec-fetch-mode': 'cors',
         'sec-fetch-dest': 'empty',
         'referer': 'https://selfregistration.cowin.gov.in/',
-        'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8'
+        'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8',
+        'x-api-key': '3sjOr2rmM52GzhpMHjDEE1kpQeRxwFDr4YcBEimi'
     }
 })
 
@@ -122,8 +123,8 @@ class Cowin {
                 gender_id,
                 photo_id_type,
                 photo_id_number,
-                comorbidity_ind: "Y",
-                consent_version: "V1"
+                comorbidity_ind: "N",
+                consent_version: "1"
             }
         })
         return res.data.beneficiary_reference_id
