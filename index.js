@@ -24,6 +24,15 @@ const httpCowin = axios.create({
 })
 
 class Cowin {
+
+    /**
+     * @private
+     */
+    static _getToday () {
+        const dateObj = new Date()
+        return `${String(dateObj.getDate()).padStart(2, '0')}-${String(dateObj.getMonth()+1).padStart(2, '0')}-${dateObj.getFullYear()}`
+    }
+
     /**
      * @param {number} number Mobile number 10digit
      * @returns {Promise<string>} Txn ID
@@ -31,7 +40,7 @@ class Cowin {
     static async sendOtp(number) {
         const res = await httpCowin({
             method: 'POST',
-            url: 'http://cdn-api.co-vin.in/api/v2/auth/generateMobileOTP',
+            url: '/api/v2/auth/generateMobileOTP',
             data: {
                 mobile: number,
                 secret: "U2FsdGVkX19at5EJPMYRe6TTDK4WWA2Nyb6b6c+QAmcYQjuhurrk6+CUqmMKHtSeaETDAIuXC+7Jz+ioZvkG+Q=="
@@ -49,7 +58,7 @@ class Cowin {
     static async verifyOtp(txnId, otp) {
         const res = await httpCowin({
             method: 'POST',
-            url: 'http://cdn-api.co-vin.in/api/v2/auth/validateMobileOtp',
+            url: '/api/v2/auth/validateMobileOtp',
             data: {
                 otp: sha256(otp),
                 txnId: txnId
@@ -65,7 +74,7 @@ class Cowin {
     static async getBeneficiaries(token) {
         const res = await httpCowin({
             method: 'GET',
-            url: 'http://cdn-api.co-vin.in/api/v2/appointment/beneficiaries',
+            url: '/api/v2/appointment/beneficiaries',
             headers: {
                 authorization: 'Bearer ' + token
             }
@@ -79,7 +88,7 @@ class Cowin {
     static async getIdTypes() {
         const res = await httpCowin({
             method: 'GET',
-            url: ' https://cdn-api.co-vin.in/api/v2/registration/beneficiary/idTypes',
+            url: '/api/v2/registration/beneficiary/idTypes',
         })
         return res.data.types
     }
@@ -103,7 +112,7 @@ class Cowin {
     static async addBeneficiary({ name, birth_year, gender_id, photo_id_type, photo_id_number }, token) {
         const res = await httpCowin({
             method: 'POST',
-            url: 'http://cdn-api.co-vin.in/api/v2/registration/beneficiary/new',
+            url: '/api/v2/registration/beneficiary/new',
             headers: {
                 authorization: 'Bearer ' + token
             },
@@ -128,7 +137,7 @@ class Cowin {
     static async deleteBeneficiary (token, beneficiary_reference_id) {
         const res = await httpCowin({
             method: 'POST',
-            url: ' https://www.cowin.gov.in/api/v2/registration/beneficiary/delete',
+            url: '/api/v2/registration/beneficiary/delete',
             headers: {
                 authorization: 'Bearer ' + token
             },
@@ -137,6 +146,23 @@ class Cowin {
             }
         })
         return res.status
+    }
+
+    /**
+     * Get Centers by Pincode
+     * @param {number} pincode 6 digit pincode
+     * @returns {Promise<Array>} list of centers
+     */
+    static async getCentersByPincode (pincode) {
+        const res = await httpCowin({
+            method: 'GET',
+            url: '/api/v2/appointment/sessions/public/calendarByPin',
+            params: {
+                pincode,
+                date: this._getToday()
+            }
+        })
+        return res.data.centers
     }
 }
 
