@@ -156,7 +156,7 @@ class Cowin {
     static async getCentersByPincode (pincode) {
         const res = await httpCowin({
             method: 'GET',
-            url: 'https://cdndemo-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin',
+            url: '/api/v2/appointment/sessions/public/calendarByPin',
             params: {
                 pincode,
                 date: this._getToday()
