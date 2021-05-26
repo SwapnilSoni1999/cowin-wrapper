@@ -6,7 +6,7 @@ const sha256 = (data) => {
 }
 
 const httpCowin = axios.create({
-    baseURL: 'http://cdn-api.co-vin.in',
+    baseURL: 'http://cdndemo-api.co-vin.in',
     headers: {
         'authority': 'cdn-api.co-vin.in',
         'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
@@ -172,7 +172,7 @@ class Cowin {
     static async downloadCertificatae (token, beneficiary_reference_id) {
         const res = await httpCowin({
             method: 'GET',
-            url: 'https://www.cowin.gov.in/api/v2/registration/certificate/download',
+            url: '/api/v2/registration/certificate/download',
             params: {
                 beneficiary_reference_id
             },
