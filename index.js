@@ -183,6 +183,24 @@ class Cowin {
         })
         return res.data
     }
+    
+    /**
+     * Schedules appointment for beneficiary
+     * @param {string} token JWT token
+     * @param {Object} payload required payload
+     * @returns {Promise<string>} appointment id
+     */
+    static async schedule (token, payload={ beneficiaries, dose, slot, session_id }) {
+        const res = await httpCowin({
+            method: 'POST',
+            url: '/api/v2/appointment/schedule',
+            data: payload,
+            headers: {
+                authorization: 'Bearer ' + token
+            }
+        })
+        return res.data.appointment_id
+    }
 }
 
 module.exports = Cowin
