@@ -20,5 +20,10 @@ function scanf (question) {
 
     const benef = await cowin.getBeneficiaries(token)
     console.log(benef)
+
+    const pincode = await scanf('Enter your pincode (eg. 388061):')
+    const centers = await cowin.getCentersByPincode(pincode)
+    console.log(centers)
+
     process.exit()
 })()
