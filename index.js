@@ -8,17 +8,16 @@ const sha256 = (data) => {
 const httpCowin = axios.create({
     baseURL: 'http://cdndemo-api.co-vin.in',
     headers: {
-        'authority': 'cdn-api.co-vin.in',
+        'authority': 'cdndemo-api.co-vin.in',
         'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
         'accept': 'application/json, text/plain, */*',
         'sec-ch-ua-mobile': '?0',
         'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
         'content-type': 'application/json',
-        'origin': 'https://selfregistration.cowin.gov.in',
+        'origin': 'http://cdndemo-api.co-vin.in',
         'sec-fetch-site': 'cross-site',
         'sec-fetch-mode': 'cors',
         'sec-fetch-dest': 'empty',
-        'referer': 'https://selfregistration.cowin.gov.in/',
         'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8',
         'x-api-key': '3sjOr2rmM52GzhpMHjDEE1kpQeRxwFDr4YcBEimi'
     }
@@ -41,10 +40,9 @@ class Cowin {
     static async sendOtp(number) {
         const res = await httpCowin({
             method: 'POST',
-            url: '/api/v2/auth/generateMobileOTP',
+            url: '/api/v2/auth/generateOTP',
             data: {
-                mobile: number,
-                secret: "U2FsdGVkX19at5EJPMYRe6TTDK4WWA2Nyb6b6c+QAmcYQjuhurrk6+CUqmMKHtSeaETDAIuXC+7Jz+ioZvkG+Q=="
+                mobile: number
             }
         })
 
@@ -59,7 +57,7 @@ class Cowin {
     static async verifyOtp(txnId, otp) {
         const res = await httpCowin({
             method: 'POST',
-            url: '/api/v2/auth/validateMobileOtp',
+            url: '/api/v2/auth/confirmOTP',
             data: {
                 otp: sha256(otp),
                 txnId: txnId
@@ -203,7 +201,7 @@ class Cowin {
                 authorization: 'Bearer ' + token
             }
         })
-        return res.data.appointment_id
+        return res.data
     }
 }
 
