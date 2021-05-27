@@ -68,12 +68,14 @@ class Cowin {
             config.data.secret = 'U2FsdGVkX19gg1fHCWvmS/3a8YterUFO8gpnXGCile+XwRAIcUa6UsxGPxrc4KE6g4Ne4ewcvKYhs+1ObNBTPQ=='
         }
         switch (api) {
-            case 'private':
+            case 'private': {
                 const res = await httpCowinPrivate(config)
                 return res.data.txnId
-            default:
+            }
+            default: {
                 const res = await httpCowinDemo(config)
                 return res.data.txnId
+            }
         }
     }
 
@@ -93,12 +95,14 @@ class Cowin {
             }
         }
         switch(api) {
-            case 'private':
+            case 'private': {
                 const res = await httpCowinPrivate(config)
                 return res.data.token
-            default:
+            }
+            default: {
                 const res = await httpCowinDemo(config)
                 return res.data.token
+            }
         }
     }
     
@@ -116,12 +120,14 @@ class Cowin {
             }
         }
         switch(api) {
-            case 'private':
+            case 'private': {
                 const res = await httpCowinPrivate(config)
                 return res.data.beneficiaries
-            default:
+            }
+            default: {
                 const res = await httpCowinDemo(config)
                 return res.data.beneficiaries
+            }
         }
     }
 
@@ -229,12 +235,14 @@ class Cowin {
             responseType: 'arraybuffer'
         }
         switch(api) {
-            case 'private':
+            case 'private': {
                 const res = await httpCowinPrivate(config)
                 return res.data
-            default:
+            }
+            default: {
                 const res = await httpCowinDemo(config)
                 return res.data
+            }
         }
     }
     
