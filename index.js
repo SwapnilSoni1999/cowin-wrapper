@@ -5,7 +5,25 @@ const sha256 = (data) => {
     return crypto.createHash('sha256').update(data).digest('hex')
 }
 
-const httpCowin = axios.create({
+const httpCowinPrivate = axios.create({
+    baseURL: 'http://cdn-api.co-vin.in',
+    headers: {
+        'authority': 'cdn-api.co-vin.in',
+        'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+        'accept': 'application/json, text/plain, */*',
+        'sec-ch-ua-mobile': '?0',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
+        'content-type': 'application/json',
+        'origin': 'http://cdn-api.co-vin.in',
+        'sec-fetch-site': 'cross-site',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-dest': 'empty',
+        'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8',
+        'x-api-key': '3sjOr2rmM52GzhpMHjDEE1kpQeRxwFDr4YcBEimi'
+    }
+})
+
+const httpCowinDemo = axios.create({
     baseURL: 'http://cdndemo-api.co-vin.in',
     headers: {
         'authority': 'cdndemo-api.co-vin.in',
@@ -35,57 +53,83 @@ class Cowin {
 
     /**
      * @param {number} number Mobile number 10digit
+     * @param {'private'|'demo'} api choose api
      * @returns {Promise<string>} Txn ID
      */
-    static async sendOtp(number) {
-        const res = await httpCowin({
+    static async sendOtp(number, api='demo') {
+        const config = {
             method: 'POST',
-            url: '/api/v2/auth/generateOTP',
+            url: `/api/v2/auth/${api === 'private' ? 'generateMobileOTP' : 'generateOTP'}`,
             data: {
                 mobile: number
             }
-        })
-
-        return res.data.txnId
+        }
+        if (api === 'private') {
+            config.data.secret = 'U2FsdGVkX19gg1fHCWvmS/3a8YterUFO8gpnXGCile+XwRAIcUa6UsxGPxrc4KE6g4Ne4ewcvKYhs+1ObNBTPQ=='
+        }
+        switch (api) {
+            case 'private':
+                const res = await httpCowinPrivate(config)
+                return res.data.txnId
+            default:
+                const res = await httpCowinDemo(config)
+                return res.data.txnId
+        }
     }
 
     /**
      * @param {string} txnId Transaction id from sendOtp
      * @param {number} otp otp number
+     * @param {'private'|'demo'} api choose api
      * @returns {Promise<string>} JWT Token
      */
-    static async verifyOtp(txnId, otp) {
-        const res = await httpCowin({
+    static async verifyOtp(txnId, otp, api='demo') {
+        const config = {
             method: 'POST',
-            url: '/api/v2/auth/confirmOTP',
+            url: `/api/v2/auth/${api === 'demo' ? 'confirmOTP' : 'validateMobileOtp'}`,
             data: {
                 otp: sha256(otp),
-                txnId: txnId
+                txnId
             }
-        })
-        return res.data.token
+        }
+        switch(api) {
+            case 'private':
+                const res = await httpCowinPrivate(config)
+                return res.data.token
+            default:
+                const res = await httpCowinDemo(config)
+                return res.data.token
+        }
     }
     
     /**
      * @param {string} token JWT token
+     * @param {'private'|'demo'} api choose api
      * @returns {Promise<Array>} beneficiaries
      */
-    static async getBeneficiaries(token) {
-        const res = await httpCowin({
+    static async getBeneficiaries(token, api='demo') {
+        const config = {
             method: 'GET',
             url: '/api/v2/appointment/beneficiaries',
             headers: {
                 authorization: 'Bearer ' + token
             }
-        })
-        return res.data.beneficiaries
+        }
+        switch(api) {
+            case 'private':
+                const res = await httpCowinPrivate(config)
+                return res.data.beneficiaries
+            default:
+                const res = await httpCowinDemo(config)
+                return res.data.beneficiaries
+        }
     }
 
     /**
      * @returns {Promise<Array>} ID types
      */
     static async getIdTypes() {
-        const res = await httpCowin({
+        const res = await httpCowinDemo({
             method: 'GET',
             url: '/api/v2/registration/beneficiary/idTypes',
         })
@@ -96,7 +140,7 @@ class Cowin {
      * @returns {Promise<Array>} Gender types
      */
     static async getGenders() {
-        const res = await httpCowin({
+        const res = await httpCowinDemo({
             method: 'GET',
             url: '/api/v2/registration/beneficiary/genders',
         })
@@ -109,7 +153,7 @@ class Cowin {
      * @returns {Promise<string>} beneficiary_reference_id
      */
     static async addBeneficiary({ name, birth_year, gender_id, photo_id_type, photo_id_number }, token) {
-        const res = await httpCowin({
+        const res = await httpCowinDemo({
             method: 'POST',
             url: '/api/v2/registration/beneficiary/new',
             headers: {
@@ -134,7 +178,7 @@ class Cowin {
      * @returns {Promise<number>} status code 204
      */
     static async deleteBeneficiary (token, beneficiary_reference_id) {
-        const res = await httpCowin({
+        const res = await httpCowinDemo({
             method: 'POST',
             url: '/api/v2/registration/beneficiary/delete',
             headers: {
@@ -153,7 +197,7 @@ class Cowin {
      * @returns {Promise<Array>} list of centers
      */
     static async getCentersByPincode (pincode, token) {
-        const res = await httpCowin({
+        const res = await httpCowinDemo({
             method: 'GET',
             url: '/api/v2/appointment/sessions/calendarByPin',
             params: {
@@ -168,11 +212,12 @@ class Cowin {
     }
 
     /**
-     * @param {string} token JWT Token 
+     * @param {string} token JWT Token
+     * @param {'private'|'demo'} api choose api
      * @returns {Promise<ArrayBuffer>} arraybuffer of pdf file
      */
-    static async downloadCertificatae (token, beneficiary_reference_id) {
-        const res = await httpCowin({
+    static async downloadCertificatae (token, beneficiary_reference_id, api='demo') {
+        const config = {
             method: 'GET',
             url: '/api/v2/registration/certificate/download',
             params: {
@@ -182,8 +227,15 @@ class Cowin {
                 authorization: 'Bearer ' + token
             },
             responseType: 'arraybuffer'
-        })
-        return res.data
+        }
+        switch(api) {
+            case 'private':
+                const res = await httpCowinPrivate(config)
+                return res.data
+            default:
+                const res = await httpCowinDemo(config)
+                return res.data
+        }
     }
     
     /**
@@ -193,7 +245,7 @@ class Cowin {
      * @returns {Promise<string>} appointment id
      */
     static async schedule (token, payload={ beneficiaries, dose, slot, session_id }) {
-        const res = await httpCowin({
+        const res = await httpCowinDemo({
             method: 'POST',
             url: '/api/v2/appointment/schedule',
             data: payload,
