@@ -154,13 +154,16 @@ class Cowin {
      * @param {number} pincode 6 digit pincode
      * @returns {Promise<Array>} list of centers
      */
-    static async getCentersByPincode (pincode) {
+    static async getCentersByPincode (pincode, token) {
         const res = await httpCowin({
             method: 'GET',
-            url: '/api/v2/appointment/sessions/public/calendarByPin',
+            url: '/api/v2/appointment/sessions/calendarByPin',
             params: {
                 pincode,
                 date: this._getToday()
+            },
+            headers: {
+                authorization: 'Bearer ' + token
             }
         })
         return res.data.centers
