@@ -261,7 +261,7 @@ class Cowin {
                 authorization: 'Bearer ' + token
             }
         })
-        return res.data
+        return res.data.appointment_confirmation_no
     }
 
     /**
