@@ -268,7 +268,7 @@ class Cowin {
      * @param {string} token JWT token
      * @param {{appointment_id: string, beneficiariesToCancel: Array<string>}} payload payload to cancel for
      * @param {'demo'|'private'} api Private API
-     * @returns {number} status code 204
+     * @returns {Promise<number>} status code 204
      */
     static async cancelAppointment (token, payload={ appointment_id, beneficiariesToCancel }, api='demo') {
         const config = {
@@ -280,12 +280,14 @@ class Cowin {
             }
         }
         switch (api) {
-            case 'private':
+            case 'private': {
                 const res = await httpCowinPrivate(config)
                 return res.status
-            default:
+            }
+            default: {
                 const res = await httpCowinDemo(config)
                 return res.status
+            }
         }
     }
 }
