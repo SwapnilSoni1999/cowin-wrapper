@@ -249,7 +249,7 @@ class Cowin {
     /**
      * Schedules appointment for beneficiary
      * @param {string} token JWT token
-     * @param {Object} payload required payload
+     * @param {{beneficiaries: Array<string>, dose: number, slot: string, session_id: string}} payload required payload
      * @returns {Promise<string>} appointment id
      */
     static async schedule (token, payload={ beneficiaries, dose, slot, session_id }) {
@@ -262,6 +262,31 @@ class Cowin {
             }
         })
         return res.data
+    }
+
+    /**
+     * @param {string} token JWT token
+     * @param {{appointment_id: string, beneficiariesToCancel: Array<string>}} payload payload to cancel for
+     * @param {'demo'|'private'} api Private API
+     * @returns {number} status code 204
+     */
+    static async cancelAppointment (token, payload={ appointment_id, beneficiariesToCancel }, api='demo') {
+        const config = {
+            method: 'POST',
+            url: '/api/v2/appointment/cancel',
+            data: payload,
+            headers: {
+                authorization: 'Bearer ' + token
+            }
+        }
+        switch (api) {
+            case 'private':
+                const res = await httpCowinPrivate(config)
+                return res.status
+            default:
+                const res = await httpCowinDemo(config)
+                return res.status
+        }
     }
 }
 
